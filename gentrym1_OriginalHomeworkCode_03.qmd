@@ -15,18 +15,18 @@ html:
 ## Preliminary
 
 ```{r}
-#| label: Loading Packages and Data
+#| label: Loading Packages
 
 #install.packages("rmdformats", repos = "http://cran.us.r-project.org")
 library(tidyverse)
 library(rmdformats)
-
-# Read zombies.csv and store data in dataframe df
-df <- read.csv("C:/Users/mille/Documents/School/BU Undergrad/Senior/Spring25/AN588/AN588-Homework3-gentrym1/zombies.csv")
 ```
 
 ```{r}
 #| label: Setting up Data Frame
+
+# Read zombies.csv and store data in dataframe df
+df <- read.csv("C:/Users/mille/Documents/School/BU Undergrad/Senior/Spring25/AN588/AN588-Homework3-gentrym1/zombies.csv")
 
 df <- df %>% 
   mutate( 
@@ -46,27 +46,120 @@ df <- df %>%
 
 ## Question 1
 
-Calculate the *population* mean and standard deviation for each quantitative random variable (height, weight, age, number of zombies killed, and years of education). NOTE: You will not want to use the built in `var()` and `sd()` commands as these are for *samples*.
+Calculate the *population* mean and standard deviation for each quantitative random variable (height, weight, age, number of zombies killed, and years of education).
 
 ```{r}
+#| label: Means and SDs
+
+# defining functions for population variance (pop_var) and
+# population standard deviation (pop_sd)
+pop_var <- function(x){
+  sum((x - mean(x))^2)/(length(x))  # sum of squares over population size
+}
+pop_sd <- function(x){
+  sqrt(pop_var(x))  # sqrt of variance = standard deviation
+}
+
 h_mean <- mean(df$height) # mean height
-h_sd
+h_sd <- pop_sd(df$height) # sd of height
 w_mean <- mean(df$weight) # mean weight
-w_sd
+w_sd <- pop_sd(df$weight)
 age_mean <- mean(df$age) # mean age
-age_sd
+age_sd <- pop_sd(df$age)
 kdr_mean <- mean(df$zombies_killed) # mean number of zombies killed
-kdr_sd
+kdr_sd <- pop_sd(df$zombies_killed)
 edu_mean <- mean(df$education) # mean number of years of education
-edu_sd
+edu_sd <- pop_sd(df$education)
+
+# creating matrix of stats for easy access
+names <- c("mean height", "height sd", "mean weight", "weight sd", "mean age", "age sd", "mean kills", "kills sd", "mean years of edu", "years of edu sd")
+stat_array <- c(h_mean, h_sd, w_mean, w_sd, age_mean, age_sd, kdr_mean, kdr_sd, edu_mean, edu_sd)
+
+pop_stats <- matrix(stat_array, nrow=10, ncol=1, byrow=TRUE)
+rownames(pop_stats) <- names
+colnames(pop_stats) <- "Value"
+pop_stats
 ```
 
 ## Question 2
 
+Use {ggplot} to make boxplots of each of these variables by gender.
+
+```{r}
+#| label: Box Plot by Gender
+
+gender_stats <- df %>% 
+  group_by(gender) %>% 
+  summarise(
+  mean_height = mean(height),
+  height_sd = pop_sd(height),
+  mean_weight = mean(weight),
+  weight_sd = pop_sd(weight),
+  mean_age = mean(age),
+  age_sd = pop_sd(age),
+  mean_z_kills = mean(zombies_killed),
+  z_kills_sd = pop_sd(zombies_killed),
+  mean_education = mean(education),
+  education_sd = pop_sd(education)
+  )
+```
+
 ## Question 3
+
+### 3.1
+
+Use {ggplot} to make scatterplots of height and weight in relation to age.
+
+### 3.2
+
+Do these variables seem to be related? In what way?
 
 ## Question 4
 
+### 4.1
+
+Using histograms and Q-Q plots, check whether the quantitative variables seem to be drawn from a normal distribution.
+
+### 4.2
+
+Which seem to be and which do not (hint: not all are drawn from the normal distribution)?
+
+### 4.3
+
+For those that are not normal, can you determine from which common distribution they are drawn?
+
 ## Question 5
 
+### 5.1
+
+Now use the `sample()` function to sample ONE subset of 30 zombie survivors (without replacement) from this population and calculate the mean and sample standard deviation for each variable.
+
+### 5.2
+
+Also estimate the standard error for each variable, and construct the 95% confidence interval for each mean.
+
+Note that for the variables that are not drawn from the normal distribution, you may need to base your estimate of the CIs on slightly different code than for the normal…
+
 ## Question 6
+
+### 6.1
+
+Now draw 99 more random samples of 30 zombie apocalypse survivors, and calculate the mean for each variable for each of these samples.
+
+```{r}
+
+```
+
+### 6.2
+
+Together with the first sample you drew, you now have a set of 100 means for each variable (each based on 30 observations), which constitutes a *sampling* distribution for each variable. What are the means and standard deviations of this distribution of means for each variable?
+
+### 6.3
+
+How do the standard deviations of means compare to the standard errors estimated in \[5\]?
+
+### 6.4
+
+What do these sampling distributions look like (a graph might help here)? Are they normally distributed?
+
+What about for those variables that you concluded were *not* originally drawn from a normal distribution?
