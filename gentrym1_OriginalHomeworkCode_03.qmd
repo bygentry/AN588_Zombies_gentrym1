@@ -212,6 +212,8 @@ Which seem to be and which do not (hint: not all are drawn from the normal distr
 
 For those that are not normal, can you determine from which common distribution they are drawn?
 
+> Both are count data, so I think they draw from a Poisson distribution.
+
 ## Question 5
 
 ### 5.1
