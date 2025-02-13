@@ -1,0 +1,72 @@
+---
+title: "gentrym1_OriginalHomeworkCode_03"
+author: "Gentry Miller"
+format: html
+editor: visual
+theme: readthedown
+html:
+  toc: TRUE
+  toc-depth: 2
+  toc-title: Contents
+---
+
+# Homework 3
+
+## Preliminary
+
+```{r}
+#| label: Loading Packages and Data
+
+#install.packages("rmdformats", repos = "http://cran.us.r-project.org")
+library(tidyverse)
+library(rmdformats)
+
+# Read zombies.csv and store data in dataframe df
+df <- read.csv("C:/Users/mille/Documents/School/BU Undergrad/Senior/Spring25/AN588/AN588-Homework3-gentrym1/zombies.csv")
+```
+
+```{r}
+#| label: Setting up Data Frame
+
+df <- df %>% 
+  mutate( 
+    id = as.numeric(id),
+    first_name = as.factor(first_name),
+    last_name = as.factor(last_name),
+    gender = as.factor(gender),
+    height = as.numeric(height),
+    weight = as.numeric(weight),
+    zombies_killed = as.numeric(zombies_killed),
+    years_of_education = as.numeric(years_of_education),
+    major = as.factor(major),
+    age = as.numeric(age)
+  ) %>% 
+  rename(education = years_of_education)
+```
+
+## Question 1
+
+Calculate the *population* mean and standard deviation for each quantitative random variable (height, weight, age, number of zombies killed, and years of education). NOTE: You will not want to use the built in `var()` and `sd()` commands as these are for *samples*.
+
+```{r}
+h_mean <- mean(df$height) # mean height
+h_sd
+w_mean <- mean(df$weight) # mean weight
+w_sd
+age_mean <- mean(df$age) # mean age
+age_sd
+kdr_mean <- mean(df$zombies_killed) # mean number of zombies killed
+kdr_sd
+edu_mean <- mean(df$education) # mean number of years of education
+edu_sd
+```
+
+## Question 2
+
+## Question 3
+
+## Question 4
+
+## Question 5
+
+## Question 6
