@@ -18,8 +18,9 @@ html:
 #| label: Loading Packages
 
 #install.packages("rmdformats", repos = "http://cran.us.r-project.org")
-library(tidyverse)
-library(rmdformats)
+#library(tidyverse)
+#library(rmdformats)
+#library(cowplot)
 ```
 
 ```{r}
@@ -86,22 +87,49 @@ pop_stats
 Use {ggplot} to make boxplots of each of these variables by gender.
 
 ```{r}
-#| label: Box Plot by Gender
+#| label: Box Plots by Gender
 
-gender_stats <- df %>% 
-  group_by(gender) %>% 
-  summarise(
-  mean_height = mean(height),
-  height_sd = pop_sd(height),
-  mean_weight = mean(weight),
-  weight_sd = pop_sd(weight),
-  mean_age = mean(age),
-  age_sd = pop_sd(age),
-  mean_z_kills = mean(zombies_killed),
-  z_kills_sd = pop_sd(zombies_killed),
-  mean_education = mean(education),
-  education_sd = pop_sd(education)
-  )
+colors = c("plum1","steelblue1", "olivedrab2")
+
+# creating plots to be placed in array
+# mean height
+p1 <- ggplot(data=df, aes(x = gender, y = height, fill = gender))
+p1 <- p1 + geom_boxplot(show.legend = FALSE)
+p1 <- p1 + ylab("Height (in)")
+p1 <- p1 + xlab("Gender")
+p1 <- p1 + scale_fill_manual(values = colors)
+
+# mean weight
+p2 <- ggplot(data=df, aes(x = gender, y = weight, fill = gender))
+p2 <- p2 + geom_boxplot(show.legend = FALSE)
+p2 <- p2 + ylab("Weight (lbs)")
+p2 <- p2 + xlab("Gender")
+p2 <- p2 + scale_fill_manual(values = colors)
+
+# mean age
+p3 <- ggplot(data=df, aes(x = gender, y = age, fill = gender))
+p3 <- p3 + geom_boxplot(show.legend = FALSE)
+p3 <- p3 + ylab("Age (years)")
+p3 <- p3 + xlab("Gender")
+p3 <- p3 + scale_fill_manual(values = colors)
+
+# mean zombies killed
+p4 <- ggplot(data=df, aes(x = gender, y = zombies_killed, fill = gender))
+p4 <- p4 + geom_boxplot(show.legend = FALSE)
+p4 <- p4 + ylab("Zombies Killed")
+p4 <- p4 + xlab("Gender")
+p4 <- p4 + scale_fill_manual(values = colors)
+
+# mean years of education
+p5 <- ggplot(data=df, aes(x = gender, y = education, fill = gender))
+p5 <- p5 + geom_boxplot(show.legend = FALSE)
+p5 <- p5 + ylab("Years of Education")
+p5 <- p5 + xlab("Gender")
+p5 <- p5 + scale_fill_manual(values = colors)
+
+# Plot grid
+pgrid1 <- plot_grid(p1, p2, p3, p4, p5, nrow = 2, ncol = 3)
+pgrid1
 ```
 
 ## Question 3
@@ -110,9 +138,32 @@ gender_stats <- df %>%
 
 Use {ggplot} to make scatterplots of height and weight in relation to age.
 
+```{r}
+#| label: Scatter Plots by Age
+
+# creating plots to go into the grid
+p6 <- ggplot(df, aes(x = age, y = height))
+p6 <- p6 + geom_point()  # Scatter plot
+p6 <- p6 + geom_smooth(method = "lm")  # Line of best fit (linear regression)
+p6 <- p6 + ylab("Height (in)")
+p6 <- p6 + xlab("Age (years)")
+
+p7 <- ggplot(df, aes(x = age, y = weight))
+p7 <- p7 + geom_point()  # Scatter plot
+p7 <- p7 + geom_smooth(method = "lm")  # Line of best fit (linear regression)
+p7 <- p7 + ylab("Weight (lbs)")
+p7 <- p7 + xlab("Age (years)")
+
+# creating plot grid
+pgrid2 <- plot_grid(p6, p7)
+pgrid2
+```
+
 ### 3.2
 
 Do these variables seem to be related? In what way?
+
+> Yes, both height and weight appear to be positively correlated with age.
 
 ## Question 4
 
@@ -120,9 +171,42 @@ Do these variables seem to be related? In what way?
 
 Using histograms and Q-Q plots, check whether the quantitative variables seem to be drawn from a normal distribution.
 
+```{r}
+#| label: Histograms and QQ Plots
+
+# height
+hist(df$height, breaks = seq(from = 50, to = 85, by = .5), xlab = "Height (in)", probability = TRUE)
+qqnorm(df$height, main = "Height QQ Plot")
+qqline(df$height, col = "orange")
+
+# weight
+hist(df$weight, breaks = seq(from = 90, to = 215, by = 1), xlab = "Weight (lbs)", probability = TRUE)
+qqnorm(df$weight, main = "Weight QQ Plot")
+qqline(df$weight, col = "orange")
+
+# age
+hist(df$age, breaks = seq(from = 10, to = 30, by = 0.5), xlab = "Age", probability = TRUE)
+qqnorm(df$age, main = "Age QQ Plot")
+qqline(df$age, col = "orange")
+
+# zombie kills
+hist(df$zombies_killed, breaks = seq(from = 0, to = 12, by = 1), xlab = "Zombies Killed", probability = TRUE)
+qqnorm(df$zombies_killed, main = "Zombie Kills QQ Plot")
+qqline(df$zombies_killed, col = "orange")
+
+# years of education
+hist(df$education, breaks = seq(from = 0, to = 8, by = 1), xlab = "Years of Education", probability = TRUE)
+qqnorm(df$education, main = "Years of Edu. QQ Plot")
+qqline(df$education, col = "orange")
+
+# h, w, a, k, e
+```
+
 ### 4.2
 
 Which seem to be and which do not (hint: not all are drawn from the normal distribution)?
+
+> It seems like Zombies Killed and Years of Education are the only statistics that aren't drawn from the normal distribution.
 
 ### 4.3
 
