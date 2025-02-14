@@ -198,8 +198,6 @@ qqline(df$zombies_killed, col = "orange")
 hist(df$education, breaks = seq(from = 0, to = 8, by = 1), xlab = "Years of Education", probability = TRUE)
 qqnorm(df$education, main = "Years of Edu. QQ Plot")
 qqline(df$education, col = "orange")
-
-# h, w, a, k, e
 ```
 
 ### 4.2
@@ -220,11 +218,39 @@ For those that are not normal, can you determine from which common distribution 
 
 Now use the `sample()` function to sample ONE subset of 30 zombie survivors (without replacement) from this population and calculate the mean and sample standard deviation for each variable.
 
+```{r}
+#| label: Sampling
+
+s1 <- sample_n(df, size = 30, replace = FALSE)
+s1_h_mean <- mean(s1$height) # mean height of the sample
+s1_h_sd <- sd(s1$height) # standard deviation of the height of the sample
+s1_w_mean <- mean(s1$weight) # mean weight of the sample
+s1_w_sd <- sd(s1$weight) # standard deviation of the weight of the sample
+s1_a_mean <- mean(s1$age) # mean age of the sample
+s1_a_sd <- sd(s1$age) # standard deviation of the age of the sample
+s1_k_mean <- mean(s1$zombies_killed) # mean number of zombies killed of the sample
+s1_k_sd <- sd(s1$zombies_killed) # standard deviation of the number of zombies killed of the sample
+s1_e_mean <- mean(s1$education) # mean years of education of the sample
+s1_e_sd <- sd(s1$education) # standard deviation of the years of education of the sample
+
+stat_array <- c(s1_h_mean, s1_h_sd, s1_w_mean, s1_w_sd, s1_a_mean, s1_a_sd, s1_k_mean, s1_k_sd, s1_e_mean, s1_e_sd)
+samp_stats <- matrix(stat_array, nrow=10, ncol=1, byrow=TRUE)
+rownames(samp_stats) <- names
+colnames(samp_stats) <- "Value"
+samp_stats
+```
+
 ### 5.2
 
 Also estimate the standard error for each variable, and construct the 95% confidence interval for each mean.
 
 Note that for the variables that are not drawn from the normal distribution, you may need to base your estimate of the CIs on slightly different code than for the normal…
+
+```{r}
+#| label: Standard Errors and CIs
+
+
+```
 
 ## Question 6
 
