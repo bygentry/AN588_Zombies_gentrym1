@@ -12,6 +12,8 @@ html:
 
 # Homework 3
 
+![An enhanced "affamé" from Daryl Dixon (The Walking Dead Spinoff)](images/daryl-dixon-walker.avif){fig-align="center"}
+
 ## Preliminary
 
 ```{r}
