@@ -221,24 +221,24 @@ Now use the `sample()` function to sample ONE subset of 30 zombie survivors (wit
 ```{r}
 #| label: Sampling
 
-# create a sample, s1, of size 30 without replacement
+# create a sample, s, of size 30 without replacement
 n = 30
-s1 <- sample_n(df, size = n, replace = FALSE)
+s <- sample_n(df, size = n, replace = FALSE)
 
-# calculate the mean and standard deviation for each statistic of the sample
-s1_h_mean <- mean(s1$height) # mean height of the sample
-s1_h_sd <- sd(s1$height) # standard deviation of the height of the sample
-s1_w_mean <- mean(s1$weight) # mean weight of the sample
-s1_w_sd <- sd(s1$weight) # standard deviation of the weight of the sample
-s1_a_mean <- mean(s1$age) # mean age of the sample
-s1_a_sd <- sd(s1$age) # standard deviation of the age of the sample
-s1_k_mean <- mean(s1$zombies_killed) # mean number of zombies killed of the sample
-s1_k_sd <- sd(s1$zombies_killed) # standard deviation of the number of zombies killed of the sample
-s1_e_mean <- mean(s1$education) # mean years of education of the sample
-s1_e_sd <- sd(s1$education) # standard deviation of the years of education of the sample
+# calculate the mean and standard deviation (sd) for each statistic of the sample
+s_h_mean <- mean(s$height) # mean height of the sample
+s_h_sd <- sd(s$height) # sd of the height of the sample
+s_w_mean <- mean(s$weight) # mean weight of the sample
+s_w_sd <- sd(s$weight) # sd of the weight of the sample
+s_a_mean <- mean(s$age) # mean age of the sample
+s_a_sd <- sd(s$age) # sd of the age of the sample
+s_k_mean <- mean(s$zombies_killed) # mean number of zombies killed of the sample
+s_k_sd <- sd(s$zombies_killed) # sd of the num of zombies killed of the sample
+s_e_mean <- mean(s$education) # mean years of education of the sample
+s_e_sd <- sd(s$education) # sd of the years of education of the sample
 
 # create an array of the sample stats for presentation
-stat_array <- c(s1_h_mean, s1_h_sd, s1_w_mean, s1_w_sd, s1_a_mean, s1_a_sd, s1_k_mean, s1_k_sd, s1_e_mean, s1_e_sd)
+stat_array <- c(s_h_mean, s_h_sd, s_w_mean, s_w_sd, s_a_mean, s_a_sd, s_k_mean, s_k_sd, s_e_mean, s_e_sd)
 samp_stats <- matrix(stat_array, nrow=10, ncol=1, byrow=TRUE)
 rownames(samp_stats) <- names
 colnames(samp_stats) <- "Value"
@@ -256,16 +256,16 @@ Note that for the variables that are not drawn from the normal distribution, you
 
 # store the estimated standard error for each variable; 
 # h = height, w = weight, a = age, k = zombies_killed, e = years of education
-# s1 refers to the sample created in 5.1
-h_std_err <- s1_h_sd/sqrt(n)
-w_std_err <- s1_w_sd/sqrt(n)
-a_std_err <- s1_a_sd/sqrt(n)
-k_std_err <- s1_k_sd/sqrt(n)
-e_std_err <- s1_e_sd/sqrt(n)
+# s refers to the sample created in 5.1
+h_std_err <- s_h_sd/sqrt(n)
+w_std_err <- s_w_sd/sqrt(n)
+a_std_err <- s_a_sd/sqrt(n)
+k_std_err <- s_k_sd/sqrt(n)
+e_std_err <- s_e_sd/sqrt(n)
 
 # create lists of the standard errors, means, and variable names
 sems <- c(h_std_err, w_std_err, a_std_err, k_std_err, e_std_err)
-means <- c(s1_h_mean, s1_w_mean, s1_a_mean, s1_k_mean, s1_e_mean)
+means <- c(s_h_mean, s_w_mean, s_a_mean, s_k_mean, s_e_mean)
 names <- c("height", "weight", "age", "zombies_killed", "education")
 
 # create holders for lower, upper, and CI to fill with loop
@@ -302,16 +302,77 @@ samp_CIs
 Now draw 99 more random samples of 30 zombie apocalypse survivors, and calculate the mean for each variable for each of these samples.
 
 ```{r}
-
+samp_means <- vector("list", 99)
+for (i in 1:99) {
+    temp <- sample_n(df, size = n, replace = FALSE)
+    samp_means[[i]] <- c(mean(temp$height), mean(temp$weight), mean(temp$age), mean(temp$zombies_killed), mean(temp$education))
+}
 ```
 
 ### 6.2
 
 Together with the first sample you drew, you now have a set of 100 means for each variable (each based on 30 observations), which constitutes a *sampling* distribution for each variable. What are the means and standard deviations of this distribution of means for each variable?
 
+```{r}
+#| label: Means and SDs of Sampling Distribution
+
+# convert means (array of means from first sample) into a list
+# concatenate the means list with the samp_means list (the list of means for the 99 samples)
+means <- list(means)
+samp_means <- c(samp_means, means)
+
+# Now we have a list of 100 vectors of means 
+
+# initialize an empty vector for each variable to store
+# the values of the corresponding variables for each sample
+samp_heights <- NULL
+samp_weights <- NULL
+samp_ages <- NULL
+samp_kills <- NULL
+samp_edus <- NULL
+
+# for all 100 samples, store the appropriate variable 
+# in the corresponding vector
+for(i in 1:100){
+  samp_heights[i] = samp_means[[i]][1]
+  samp_weights[i] = samp_means[[i]][2]
+  samp_ages[i] = samp_means[[i]][3]
+  samp_kills[i] = samp_means[[i]][4]
+  samp_edus[i] = samp_means[[i]][5]
+}
+
+# store the mean and sd of the means for each variable of each sample
+s_h_mean <- mean(samp_heights)
+s_h_sd <- sd(samp_heights)
+s_w_mean <- mean(samp_weights)
+s_w_sd <- sd(samp_weights)
+s_a_mean <- mean(samp_ages)
+s_a_sd <- sd(samp_ages)
+s_k_mean <- mean(samp_kills)
+s_k_sd <- sd(samp_kills)
+s_e_mean <- mean(samp_edus)
+s_e_sd <- sd(samp_edus)
+
+# create a vector of the means and sds
+stat_array <- c(s_h_mean, s_h_sd, s_w_mean, s_w_sd, s_a_mean, s_a_sd, s_k_mean, s_k_sd, s_e_mean, s_e_sd)
+
+# use the stat_array vector to create a matrix of means and sds for presentation
+samp_stats <- matrix(stat_array, nrow=5, ncol=2, byrow=TRUE)
+rownames(samp_stats) <- names
+colnames(samp_stats) <- c("Mean", "SD")
+samp_stats
+```
+
 ### 6.3
 
 How do the standard deviations of means compare to the standard errors estimated in \[5\]?
+
+```{r}
+samp_SEMs
+samp_stats
+```
+
+> They're all pretty close, the greatest difference is \~0.08 (weight)
 
 ### 6.4
 
