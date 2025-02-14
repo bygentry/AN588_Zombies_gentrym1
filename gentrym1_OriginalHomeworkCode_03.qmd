@@ -221,7 +221,11 @@ Now use the `sample()` function to sample ONE subset of 30 zombie survivors (wit
 ```{r}
 #| label: Sampling
 
-s1 <- sample_n(df, size = 30, replace = FALSE)
+# create a sample, s1, of size 30 without replacement
+n = 30
+s1 <- sample_n(df, size = n, replace = FALSE)
+
+# calculate the mean and standard deviation for each statistic of the sample
 s1_h_mean <- mean(s1$height) # mean height of the sample
 s1_h_sd <- sd(s1$height) # standard deviation of the height of the sample
 s1_w_mean <- mean(s1$weight) # mean weight of the sample
@@ -233,6 +237,7 @@ s1_k_sd <- sd(s1$zombies_killed) # standard deviation of the number of zombies k
 s1_e_mean <- mean(s1$education) # mean years of education of the sample
 s1_e_sd <- sd(s1$education) # standard deviation of the years of education of the sample
 
+# create an array of the sample stats for presentation
 stat_array <- c(s1_h_mean, s1_h_sd, s1_w_mean, s1_w_sd, s1_a_mean, s1_a_sd, s1_k_mean, s1_k_sd, s1_e_mean, s1_e_sd)
 samp_stats <- matrix(stat_array, nrow=10, ncol=1, byrow=TRUE)
 rownames(samp_stats) <- names
@@ -249,7 +254,45 @@ Note that for the variables that are not drawn from the normal distribution, you
 ```{r}
 #| label: Standard Errors and CIs
 
+# store the estimated standard error for each variable; 
+# h = height, w = weight, a = age, k = zombies_killed, e = years of education
+# s1 refers to the sample created in 5.1
+h_std_err <- s1_h_sd/sqrt(n)
+w_std_err <- s1_w_sd/sqrt(n)
+a_std_err <- s1_a_sd/sqrt(n)
+k_std_err <- s1_k_sd/sqrt(n)
+e_std_err <- s1_e_sd/sqrt(n)
 
+# create lists of the standard errors, means, and variable names
+sems <- c(h_std_err, w_std_err, a_std_err, k_std_err, e_std_err)
+means <- c(s1_h_mean, s1_w_mean, s1_a_mean, s1_k_mean, s1_e_mean)
+names <- c("height", "weight", "age", "zombies_killed", "education")
+
+# create holders for lower, upper, and CI to fill with loop
+lowers <- NULL
+uppers <- NULL
+cis <- vector("list", length(sems))
+
+# for each variable, calculate and store in the "cis" list
+# the lower, upper, and CI where alpha = 0.05
+for(i in 1:length(sems)){
+  lowers[i] <- means[i] - qnorm(1 - 0.05/2) * sems[i] # (1-alpha)/2 in the upper and lower tails of the   distribution
+  uppers[i] <- means[i] + qnorm(1 - 0.05/2) * sems[i]
+  cis[[i]] <- c(lowers[i], uppers[i])
+}
+
+# create a matrix of the standard errors for presentation
+samp_SEMs <- matrix(sems, nrow = 5, ncol = 1, byrow = TRUE)
+rownames(samp_SEMs) <- names
+colnames(samp_SEMs) <- "SEM"
+
+# create a matrix of the CIs for presentation
+samp_CIs <- matrix(unlist(cis), nrow = 5, ncol = 2, byrow = TRUE)
+rownames(samp_CIs) <- names
+colnames(samp_CIs) <- c("lower", "upper")
+
+samp_SEMs
+samp_CIs
 ```
 
 ## Question 6
