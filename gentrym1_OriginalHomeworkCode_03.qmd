@@ -378,4 +378,28 @@ samp_stats
 
 What do these sampling distributions look like (a graph might help here)? Are they normally distributed?
 
+```{r}
+#temp <- matrix(unlist(samp_means), ncol = 5, nrow = 100, byrow = TRUE)
+#colnames(temp) <- names
+#samp_df <- data.frame(temp)
+
+hist(samp_df$height, breaks = seq(from=65, to=71, by = 0.5), xlab = "Height", main = "Histogram of Sample Mean Heights", probability = TRUE, col="lightblue")
+x_vals <- seq(min(samp_df$height), max(samp_df$height), length = 100)
+y_vals <- dnorm(x_vals, mean = mean(samp_df$height), sd = sd(samp_df$height))
+lines(x_vals, y_vals, col = "red", lwd = 2)
+
+```
+
+```{r}
+
+hist(samp_df$weight, breaks = seq(from=135, to=155, by = 1), xlab = "Weight", main = "Histogram of Sample Mean Weights", probability = TRUE, col="lightblue")
+x_vals <- seq(min(samp_df$weight), max(samp_df$weight), length = 100)
+y_vals <- dnorm(x_vals, mean = mean(samp_df$weight), sd = sd(samp_df$weight))
+lines(x_vals, y_vals, col = "red", lwd = 2)
+```
+
 What about for those variables that you concluded were *not* originally drawn from a normal distribution?
+
+```{r}
+
+```
