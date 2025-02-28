@@ -434,7 +434,7 @@ lines(x_vals, y_vals, col = "red", lwd = 2)
 
 ```{r}
 #| label: Years of Education
-hist(samp_df$education, breaks = seq(from=2, to=4, by = 0.15), xlab = "Mean Years of Education", main = "Sample Mean Years of Education", probability = TRUE, col="lightblue")
+hist(samp_df$education, breaks = seq(from=min(samp_df$education - .5), to=max(samp_df$education + .5), by = 0.15), xlab = "Mean Years of Education", main = "Sample Mean Years of Education", probability = TRUE, col="lightblue")
 x_vals <- seq(min(samp_df$education), max(samp_df$education), length = 100)
 y_vals <- dnorm(x_vals, mean = mean(samp_df$education), sd = sd(samp_df$education))
 lines(x_vals, y_vals, col = "red", lwd = 2)
