@@ -1,0 +1,482 @@
+---
+title: "Zombies!"
+author: "Gentry Miller"
+format: html
+editor: visual
+theme: readthedown
+html:
+  toc: TRUE
+  toc-depth: 2
+  toc-title: Contents
+---
+
+# Homework 3
+
+![An enhanced "affamé" from Daryl Dixon (The Walking Dead Spinoff)](images/daryl-dixon-walker.avif){alt="An enhanced \"affamé\" from Daryl Dixon (The Walking Dead Spinoff)" fig-align="center"}
+
+## Preliminary
+
+```{r}
+#| label: Loading Packages
+
+#install.packages("rmdformats", repos = "http://cran.us.r-project.org")
+library(tidyverse)
+library(rmdformats)
+library(cowplot)
+```
+
+```{r}
+#| label: Setting up Data Frame
+
+# Read zombies.csv and store data in dataframe df
+df <- read.csv("https://raw.githubusercontent.com/fuzzyatelin/fuzzyatelin.github.io/refs/heads/master/AN588_Spring25/zombies.csv")
+
+df <- df %>% 
+  mutate( 
+    id = as.numeric(id),
+    first_name = as.factor(first_name),
+    last_name = as.factor(last_name),
+    gender = as.factor(gender),
+    height = as.numeric(height),
+    weight = as.numeric(weight),
+    zombies_killed = as.numeric(zombies_killed),
+    years_of_education = as.numeric(years_of_education),
+    major = as.factor(major),
+    age = as.numeric(age)
+  ) %>% 
+  rename(education = years_of_education)
+
+#Carly: I'm running into a problem where I am unable to run this chunk of code since you loaded as a csv file from your desktop. I would suggest having it read the file link directly from professor schmitt's github. This is how I did it if that's helpful: # zombies <- read.csv("https://raw.githubusercontent.com/fuzzyatelin/fuzzyatelin.github.io/refs/heads/master/AN588_Spring25/zombies.csv", header = TRUE, stringsAsFactors = FALSE) 
+```
+
+## Question 1
+
+Calculate the *population* mean and standard deviation for each quantitative random variable (height, weight, age, number of zombies killed, and years of education).
+
+```{r}
+#| label: Means and SDs
+
+# defining functions for population variance (pop_var) and
+# population standard deviation (pop_sd)
+pop_var <- function(x){
+  sum((x - mean(x))^2)/(length(x))  # sum of squares over population size
+}
+pop_sd <- function(x){
+  sqrt(pop_var(x))  # sqrt of variance = standard deviation
+}
+
+h_mean <- mean(df$height) # mean height
+h_sd <- pop_sd(df$height) # sd of height
+w_mean <- mean(df$weight) # mean weight
+w_sd <- pop_sd(df$weight)
+age_mean <- mean(df$age) # mean age
+age_sd <- pop_sd(df$age)
+kdr_mean <- mean(df$zombies_killed) # mean number of zombies killed
+kdr_sd <- pop_sd(df$zombies_killed)
+edu_mean <- mean(df$education) # mean number of years of education
+edu_sd <- pop_sd(df$education)
+
+# creating matrix of stats for easy access
+names <- c("mean height", "height sd", "mean weight", "weight sd", "mean age", "age sd", "mean kills", "kills sd", "mean years of edu", "years of edu sd")
+stat_array <- c(h_mean, h_sd, w_mean, w_sd, age_mean, age_sd, kdr_mean, kdr_sd, edu_mean, edu_sd)
+
+pop_stats <- matrix(stat_array, nrow=10, ncol=1, byrow=TRUE)
+rownames(pop_stats) <- names
+colnames(pop_stats) <- "Value"
+pop_stats
+
+#Carly: creating matrices is such a good idea for visualizing the data clearly, i am definitely going to do this now too 
+```
+
+## Question 2
+
+Use {ggplot} to make boxplots of each of these variables by gender.
+
+```{r}
+#| label: Box Plots by Gender
+
+colors = c("plum1","steelblue1", "olivedrab2")
+
+# creating plots to be placed in array
+# mean height
+p1 <- ggplot(data = df, aes(x = gender, y = height, fill = gender))
+p1 <- p1 + geom_boxplot(show.legend = FALSE)
+p1 <- p1 + ylab("Height (in)")
+p1 <- p1 + xlab("Gender")
+p1 <- p1 + scale_fill_manual(values = colors)
+
+# mean weight
+p2 <- ggplot(data=df, aes(x = gender, y = weight, fill = gender))
+p2 <- p2 + geom_boxplot(show.legend = FALSE)
+p2 <- p2 + ylab("Weight (lbs)")
+p2 <- p2 + xlab("Gender")
+p2 <- p2 + scale_fill_manual(values = colors)
+
+# mean age
+p3 <- ggplot(data=df, aes(x = gender, y = age, fill = gender))
+p3 <- p3 + geom_boxplot(show.legend = FALSE)
+p3 <- p3 + ylab("Age (years)")
+p3 <- p3 + xlab("Gender")
+p3 <- p3 + scale_fill_manual(values = colors)
+
+# mean zombies killed
+p4 <- ggplot(data=df, aes(x = gender, y = zombies_killed, fill = gender))
+p4 <- p4 + geom_boxplot(show.legend = FALSE)
+p4 <- p4 + ylab("Zombies Killed")
+p4 <- p4 + xlab("Gender")
+p4 <- p4 + scale_fill_manual(values = colors)
+
+# mean years of education
+p5 <- ggplot(data=df, aes(x = gender, y = education, fill = gender))
+p5 <- p5 + geom_boxplot(show.legend = FALSE)
+p5 <- p5 + ylab("Years of Education")
+p5 <- p5 + xlab("Gender")
+p5 <- p5 + scale_fill_manual(values = colors)
+
+# Plot grid
+pgrid1 <- plot_grid(p1, p2, p3, p4, p5, nrow = 2, ncol = 3)
+pgrid1
+
+#Carly: This section was pretty much the same as I did it, I think it looks great! Love the colors you used.
+```
+
+## Question 3
+
+### 3.1
+
+Use {ggplot} to make scatterplots of height and weight in relation to age.
+
+```{r}
+#| label: Scatter Plots by Age
+
+# creating plots to go into the grid
+p6 <- ggplot(df, aes(x = age, y = height))
+p6 <- p6 + geom_point()  # Scatter plot
+p6 <- p6 + geom_smooth(method = "lm")  # Line of best fit (linear regression)
+p6 <- p6 + ylab("Height (in)")
+p6 <- p6 + xlab("Age (years)")
+
+p7 <- ggplot(df, aes(x = age, y = weight))
+p7 <- p7 + geom_point()  # Scatter plot
+p7 <- p7 + geom_smooth(method = "lm")  # Line of best fit (linear regression)
+p7 <- p7 + ylab("Weight (lbs)")
+p7 <- p7 + xlab("Age (years)")
+
+# creating plot grid
+pgrid2 <- plot_grid(p6, p7)
+pgrid2
+
+
+#Carly: This also looks really similar to mine. If you wanted to make it look a little prettier to change the colors of the points in the scatterpoint you could use p7 <- p7 + scale_color_gradient(low = "blue", high = "green") or another set of colors. Just a suggestion for visual purposes and definitely not necessary but overall looks great.
+```
+
+### 3.2
+
+Do these variables seem to be related? In what way?
+
+> Yes, both height and weight appear to be positively correlated with age.
+
+## Question 4
+
+### 4.1
+
+Using histograms and Q-Q plots, check whether the quantitative variables seem to be drawn from a normal distribution.
+
+```{r}
+#| label: Histograms and QQ Plots
+
+# height
+hist(df$height, breaks = seq(from = 50, to = 85, by = .5), xlab = "Height (in)", probability = TRUE)
+qqnorm(df$height, main = "Height QQ Plot")
+qqline(df$height, col = "orange")
+
+# weight
+hist(df$weight, breaks = seq(from = 90, to = 215, by = 1), xlab = "Weight (lbs)", probability = TRUE)
+qqnorm(df$weight, main = "Weight QQ Plot")
+qqline(df$weight, col = "orange")
+
+# age
+hist(df$age, breaks = seq(from = 10, to = 30, by = 0.5), xlab = "Age", probability = TRUE)
+qqnorm(df$age, main = "Age QQ Plot")
+qqline(df$age, col = "orange")
+
+# zombie kills
+hist(df$zombies_killed, breaks = seq(from = 0, to = 12, by = 1), xlab = "Zombies Killed", probability = TRUE)
+qqnorm(df$zombies_killed, main = "Zombie Kills QQ Plot")
+qqline(df$zombies_killed, col = "orange")
+
+# years of education
+hist(df$education, breaks = seq(from = 0, to = 8, by = 1), xlab = "Years of Education", probability = TRUE)
+qqnorm(df$education, main = "Years of Edu. QQ Plot")
+qqline(df$education, col = "orange")
+
+#Carly: These are all again very similar to mine, I would suggest combining these into sections in a similar way you did for the question above where you plotted them in a grid. For example I used "par(mfrow = c(2, 3))" to combine all of my histograms into one page (just to make it easier to visualize).
+```
+
+### 4.2
+
+Which seem to be and which do not (hint: not all are drawn from the normal distribution)?
+
+> It seems like Zombies Killed and Years of Education are the only statistics that aren't drawn from the normal distribution.
+
+### 4.3
+
+For those that are not normal, can you determine from which common distribution they are drawn?
+
+> Both are count data, so I think they draw from a Poisson distribution.
+
+## Question 5
+
+### 5.1
+
+Now use the `sample()` function to sample ONE subset of 30 zombie survivors (without replacement) from this population and calculate the mean and sample standard deviation for each variable.
+
+```{r}
+#| label: Sampling
+
+# create a sample, s, of size 30 without replacement
+n = 30
+s <- sample_n(df, size = n, replace = FALSE)
+
+# calculate the mean and standard deviation (sd) for each statistic of the sample
+s_h_mean <- mean(s$height) # mean height of the sample
+s_h_sd <- sd(s$height) # sd of the height of the sample
+s_w_mean <- mean(s$weight) # mean weight of the sample
+s_w_sd <- sd(s$weight) # sd of the weight of the sample
+s_a_mean <- mean(s$age) # mean age of the sample
+s_a_sd <- sd(s$age) # sd of the age of the sample
+s_k_mean <- mean(s$zombies_killed) # mean number of zombies killed of the sample
+s_k_sd <- sd(s$zombies_killed) # sd of the num of zombies killed of the sample
+s_e_mean <- mean(s$education) # mean years of education of the sample
+s_e_sd <- sd(s$education) # sd of the years of education of the sample
+
+# create an array of the sample stats for presentation
+stat_array <- c(s_h_mean, s_h_sd, s_w_mean, s_w_sd, s_a_mean, s_a_sd, s_k_mean, s_k_sd, s_e_mean, s_e_sd)
+samp_stats <- matrix(stat_array, nrow=10, ncol=1, byrow=TRUE)
+rownames(samp_stats) <- names
+colnames(samp_stats) <- "Value"
+samp_stats
+
+#Carly: Love the commentary here. To be concise you could also replace size = n in: "s <- sample_n(df, size = n, replace = FALSE)" so you could remove the n=30 in the line above it (since you don't use it again). 
+#Carly: I also think it would be great in your array if you made two columns in the array to show one for mean and the other for sd: EX: 
+stat_array <- c(s_h_mean, s_w_mean, s_a_mean, s_k_mean, s_e_mean, 
+                s_h_sd, s_w_sd, s_a_sd, s_k_sd, s_e_sd)
+samp_stats <- matrix(stat_array, ncol=2, byrow=FALSE)
+rownames(samp_stats) <- c("Height", "Weight", "Age", "Zombies Killed", "Years of Education")
+colnames(samp_stats) <- c("Mean", "SD")
+samp_stats
+```
+
+### 5.2
+
+Also estimate the standard error for each variable, and construct the 95% confidence interval for each mean.
+
+Note that for the variables that are not drawn from the normal distribution, you may need to base your estimate of the CIs on slightly different code than for the normal…
+
+```{r}
+#| label: Standard Errors and CIs
+
+# store the estimated standard error for each variable; 
+# h = height, w = weight, a = age, k = zombies_killed, e = years of education
+# s refers to the sample created in 5.1
+h_std_err <- s_h_sd/sqrt(n)
+w_std_err <- s_w_sd/sqrt(n)
+a_std_err <- s_a_sd/sqrt(n)
+k_std_err <- s_k_sd/sqrt(n)
+e_std_err <- s_e_sd/sqrt(n)
+
+# create lists of the standard errors, means, and variable names
+sems <- c(h_std_err, w_std_err, a_std_err, k_std_err, e_std_err)
+means <- c(s_h_mean, s_w_mean, s_a_mean, s_k_mean, s_e_mean)
+names <- c("height", "weight", "age", "zombies_killed", "education")
+
+# create holders for lower, upper, and CI to fill with loop
+lowers <- NULL
+uppers <- NULL
+cis <- vector("list", length(sems))
+
+# for each variable, calculate and store in the "cis" list
+# the lower, upper, and CI where alpha = 0.05
+for(i in 1:length(sems)){
+  lowers[i] <- means[i] - qnorm(1 - 0.05/2) * sems[i] # (1-alpha)/2 in the upper and lower tails of the   distribution
+  uppers[i] <- means[i] + qnorm(1 - 0.05/2) * sems[i]
+  cis[[i]] <- c(lowers[i], uppers[i])
+}
+
+# create a matrix of the standard errors for presentation
+samp_SEMs <- matrix(sems, nrow = 5, ncol = 1, byrow = TRUE)
+rownames(samp_SEMs) <- names
+colnames(samp_SEMs) <- "SEM"
+
+# create a matrix of the CIs for presentation
+samp_CIs <- matrix(unlist(cis), nrow = 5, ncol = 2, byrow = TRUE)
+rownames(samp_CIs) <- names
+colnames(samp_CIs) <- c("lower", "upper")
+
+samp_SEMs
+samp_CIs
+
+#Carly: Looks great, again love the matrix for displaying the CIs.
+```
+
+## Question 6
+
+### 6.1
+
+Now draw 99 more random samples of 30 zombie apocalypse survivors, and calculate the mean for each variable for each of these samples.
+
+```{r}
+#| label: 99 more samples
+samp_means <- vector("list", 99)
+for (i in 1:99) {
+    temp <- sample_n(df, size = n, replace = FALSE)
+    samp_means[[i]] <- c(mean(temp$height), mean(temp$weight), mean(temp$age), mean(temp$zombies_killed), mean(temp$education))
+}
+```
+
+### 6.2
+
+Together with the first sample you drew, you now have a set of 100 means for each variable (each based on 30 observations), which constitutes a *sampling* distribution for each variable. What are the means and standard deviations of this distribution of means for each variable?
+
+```{r}
+#| label: Means and SDs of Sampling Distribution
+
+# convert means (array of means from first sample) into a list
+# concatenate the means list with the samp_means list (the list of means for the 99 samples)
+means <- list(means)
+samp_means <- c(samp_means, means)
+
+# Now we have a list of 100 vectors of means 
+
+# initialize an empty vector for each variable to store
+# the values of the corresponding variables for each sample
+samp_heights <- NULL
+samp_weights <- NULL
+samp_ages <- NULL
+samp_kills <- NULL
+samp_edus <- NULL
+
+# for all 100 samples, store the appropriate variable 
+# in the corresponding vector
+for(i in 1:100){
+  samp_heights[i] = samp_means[[i]][1]
+  samp_weights[i] = samp_means[[i]][2]
+  samp_ages[i] = samp_means[[i]][3]
+  samp_kills[i] = samp_means[[i]][4]
+  samp_edus[i] = samp_means[[i]][5]
+}
+
+# store the mean and sd of the means for each variable of each sample
+s_h_mean <- mean(samp_heights)
+s_h_sd <- sd(samp_heights)
+s_w_mean <- mean(samp_weights)
+s_w_sd <- sd(samp_weights)
+s_a_mean <- mean(samp_ages)
+s_a_sd <- sd(samp_ages)
+s_k_mean <- mean(samp_kills)
+s_k_sd <- sd(samp_kills)
+s_e_mean <- mean(samp_edus)
+s_e_sd <- sd(samp_edus)
+
+# create a vector of the means and sds
+stat_array <- c(s_h_mean, s_h_sd, s_w_mean, s_w_sd, s_a_mean, s_a_sd, s_k_mean, s_k_sd, s_e_mean, s_e_sd)
+
+# use the stat_array vector to create a matrix of means and sds for presentation
+samp_stats <- matrix(stat_array, nrow=5, ncol=2, byrow=TRUE)
+rownames(samp_stats) <- names
+colnames(samp_stats) <- c("Mean", "SD")
+samp_stats
+```
+
+### 6.3
+
+How do the standard deviations of means compare to the standard errors estimated in \[5\]?
+
+```{r}
+#| label: SDs vs SEMs
+samp_SEMs
+samp_stats
+```
+
+> They're all pretty close, the greatest difference is \~0.08 (weight)
+
+### 6.4
+
+What do these sampling distributions look like (a graph might help here)? Are they normally distributed?
+
+```{r}
+#| label: Setup
+temp <- matrix(unlist(samp_means), ncol = 5, nrow = 100, byrow = TRUE)
+colnames(temp) <- names
+samp_df <- data.frame(temp)
+#carly:  receiving a warning when running this section of code - something to be aware of "Warning: data length [505] is not a sub-multiple or multiple of the number of rows [100]"
+```
+
+```{r}
+#| label: Height
+hist(samp_df$height, breaks = seq(from=65, to=71, by = 0.5), xlab = "Height", main = "Histogram of Sample Mean Heights", probability = TRUE, col="lightblue")
+x_vals <- seq(min(samp_df$height), max(samp_df$height), length = 100)
+y_vals <- dnorm(x_vals, mean = mean(samp_df$height), sd = sd(samp_df$height))
+lines(x_vals, y_vals, col = "red", lwd = 2)
+
+```
+
+```{r}
+#| label: Weight
+hist(samp_df$weight, breaks = seq(from=130, to=160, by = 0.5), xlab = "Weight", main = "Sample Mean Weights", probability = TRUE, col="lightblue")
+x_vals <- seq(min(samp_df$weight), max(samp_df$weight), length = 100)
+y_vals <- dnorm(x_vals, mean = mean(samp_df$weight), sd = sd(samp_df$weight))
+lines(x_vals, y_vals, col = "red", lwd = 2)
+```
+
+```{r}
+#| label: Age
+hist(samp_df$age, breaks = seq(from=18, to=22, by = 0.25), xlab = "Age", main = "Sample Mean Ages", probability = TRUE, col="lightblue")
+x_vals <- seq(min(samp_df$age), max(samp_df$age), length = 100)
+y_vals <- dnorm(x_vals, mean = mean(samp_df$age), sd = sd(samp_df$age))
+lines(x_vals, y_vals, col = "red", lwd = 2)
+```
+
+> Weight appears less normally distributed than I thought, but height and age are pretty normal
+
+What about for those variables that you concluded were *not* originally drawn from a normal distribution?
+
+```{r}
+#| label: Kills
+hist(samp_df$zombies_killed, breaks = seq(from=2, to=4, by = 0.1), xlab = "Zombies Killed", main = "Sample Mean Zombies Killed", probability = TRUE, col="lightblue")
+x_vals <- seq(min(samp_df$zombies_killed), max(samp_df$zombies_killed), length = 100)
+y_vals <- dnorm(x_vals, mean = mean(samp_df$zombies_killed), sd = sd(samp_df$zombies_killed))
+lines(x_vals, y_vals, col = "red", lwd = 2)
+```
+
+```{r}
+#| label: Years of Education
+hist(samp_df$education, breaks = seq(from=2, to=4, by = 0.15), xlab = "Mean Years of Education", main = "Sample Mean Years of Education", probability = TRUE, col="lightblue")
+x_vals <- seq(min(samp_df$education), max(samp_df$education), length = 100)
+y_vals <- dnorm(x_vals, mean = mean(samp_df$education), sd = sd(samp_df$education))
+lines(x_vals, y_vals, col = "red", lwd = 2)
+```
+
+> Zombie kills appear to be normal, but Education is a bit weird because it has a cluster towards the lower end of the distribution. It's also worth noting that when I'm writing this, the sampling may not be very representative and the samples may be different when this gets knit.
+
+**Overall Comments From Carly:** All comments above begin with #Carly (command f for easy finding of all comments made by me!)
+
+-   I thought the way that Gentry sectioned out the multiple parts for each question was very smart and broke up the different parts of each question into a very manageable way. Also I appreciated how clear your comments were.
+
+-   I also really liked how they created a matrix for the first question to present their results very clearly. I am definitely going to incorporate these two concepts into my final version of HW3.
+
+-   I had very minor stylistic comments for Gentry regarding the presentation of the data that they generated to make it easier for others to visualize. These are again just suggestions and while I think that the way everything appears is great as is, these suggestions could be something to consider for their final version as potential changes to make.
+
+-   When I attempt to render your website into an html, I don't see the `readthedown` theme or your toc applied. Maybe this would work better?
+
+    -   "title: "Zombies!"
+        author: "Gentry Miller"
+        format:
+        html:
+        theme: readthedown
+        toc: true
+        toc-depth: 2
+        toc-title: Contents
+        editor: visual"
+
+-   Ran into one warning in terms of data length in section 6.4, made a note of it above.
