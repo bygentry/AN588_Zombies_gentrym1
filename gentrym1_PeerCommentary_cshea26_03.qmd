@@ -12,7 +12,7 @@ html:
 
 # Homework 3
 
-![An enhanced "affamé" from Daryl Dixon (The Walking Dead Spinoff)](images/daryl-dixon-walker.avif){alt="An enhanced \"affamé\" from Daryl Dixon (The Walking Dead Spinoff)" fig-align="center"}
+![An enhanced "affamé" from Daryl Dixon (The Walking Dead Spinoff)](images/daryl-dixon-walker.avif){fig-align="center"}
 
 ## Preliminary
 
@@ -469,14 +469,6 @@ lines(x_vals, y_vals, col = "red", lwd = 2)
 
 -   When I attempt to render your website into an html, I don't see the `readthedown` theme or your toc applied. Maybe this would work better?
 
-    -   "title: "Zombies!"
-        author: "Gentry Miller"
-        format:
-        html:
-        theme: readthedown
-        toc: true
-        toc-depth: 2
-        toc-title: Contents
-        editor: visual"
+    -   "title: "Zombies!" author: "Gentry Miller" format: html: theme: readthedown toc: true toc-depth: 2 toc-title: Contents editor: visual"
 
 -   Ran into one warning in terms of data length in section 6.4, made a note of it above.
