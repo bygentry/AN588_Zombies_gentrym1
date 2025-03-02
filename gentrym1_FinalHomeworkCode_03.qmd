@@ -27,6 +27,7 @@ html:
 library(tidyverse)
 library(rmdformats)
 library(cowplot)
+library(gridGraphics)
 ```
 
 ```{r}
@@ -182,30 +183,37 @@ Using histograms and Q-Q plots, check whether the quantitative variables seem to
 ```{r}
 #| label: Histograms and QQ Plots
 
-# height
-hist(df$height, breaks = seq(from = 50, to = 85, by = .5), xlab = "Height (in)", probability = TRUE)
-qqnorm(df$height, main = "Height QQ Plot")
-qqline(df$height, col = "orange")
+# defines function to create plot grid for each variable
+# takes as parameters data (variable), breaks (seq of breaks),
+#   and xlab (name of var for labels)
+plot_hist_qq <- function(data, breaks, xlab) {
+  
+  # creates histogram for each var and stores in temporary object hist_plot
+  hist_plot <- function(){
+    hist(data, breaks = breaks, probability = TRUE, xlab = xlab, col = "lightblue", main = paste(xlab, "Histogram"))
+  }
+  
+  # creates qq plot with a line for each var and stores in temporary object qq_plot
+  qq_plot <- function(){
+    qqnorm(data, main = paste(xlab, "QQ Plot"))
+    qqline(data, col = "orange")
+  }
+  
+  # uses cowplot to combine the two temp plots for each var in side by side (1x2)
+  plot_grid(hist_plot, qq_plot, ncol = 2)
+}
 
-# weight
-hist(df$weight, breaks = seq(from = 90, to = 215, by = 1), xlab = "Weight (lbs)", probability = TRUE)
-qqnorm(df$weight, main = "Weight QQ Plot")
-qqline(df$weight, col = "orange")
+pgrid3 <- plot_hist_qq(df$height, seq(50, 85, 0.5), "Height (in)")
+pgrid4 <- plot_hist_qq(df$weight, seq(90, 215, 1), "Weight (lbs)")
+pgrid5 <- plot_hist_qq(df$age, seq(10, 30, 0.5), "Age")
+pgrid6 <- plot_hist_qq(df$zombies_killed, seq(0, 12, 1), "Zombies Killed")
+pgrid7 <- plot_hist_qq(df$education, seq(0, 8, 1), "Years of Education") 
 
-# age
-hist(df$age, breaks = seq(from = 10, to = 30, by = 0.5), xlab = "Age", probability = TRUE)
-qqnorm(df$age, main = "Age QQ Plot")
-qqline(df$age, col = "orange")
-
-# zombie kills
-hist(df$zombies_killed, breaks = seq(from = 0, to = 12, by = 1), xlab = "Zombies Killed", probability = TRUE)
-qqnorm(df$zombies_killed, main = "Zombie Kills QQ Plot")
-qqline(df$zombies_killed, col = "orange")
-
-# years of education
-hist(df$education, breaks = seq(from = 0, to = 8, by = 1), xlab = "Years of Education", probability = TRUE)
-qqnorm(df$education, main = "Years of Edu. QQ Plot")
-qqline(df$education, col = "orange")
+pgrid3
+pgrid4
+pgrid5
+pgrid6
+pgrid7
 ```
 
 ### 4.2
