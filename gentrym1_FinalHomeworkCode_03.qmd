@@ -79,12 +79,12 @@ edu_mean <- mean(df$education) # mean number of years of education
 edu_sd <- pop_sd(df$education)
 
 # creating matrix of stats for easy access
-names <- c("mean height", "height sd", "mean weight", "weight sd", "mean age", "age sd", "mean kills", "kills sd", "mean years of edu", "years of edu sd")
+names <- c("height", "weight", "age", "zombies_killed", "education")
 stat_array <- c(h_mean, h_sd, w_mean, w_sd, age_mean, age_sd, kdr_mean, kdr_sd, edu_mean, edu_sd)
 
-pop_stats <- matrix(stat_array, nrow=10, ncol=1, byrow=TRUE)
+pop_stats <- matrix(stat_array, nrow=5, ncol=2, byrow=TRUE)
 rownames(pop_stats) <- names
-colnames(pop_stats) <- "Value"
+colnames(pop_stats) <- c("Mean", "SD")
 pop_stats
 ```
 
@@ -397,7 +397,7 @@ samp_df <- data.frame(temp)
 
 ```{r}
 #| label: Height
-hist(samp_df$height, breaks = seq(from=65, to=71, by = 0.5), xlab = "Height", main = "Histogram of Sample Mean Heights", probability = TRUE, col="lightblue")
+hist(samp_df$height, breaks = seq(from=min(samp_df$height) - 1, to=max(samp_df$height) + 1, by = 0.5), xlab = "Height", main = "Histogram of Sample Mean Heights", probability = TRUE, col="lightblue")
 x_vals <- seq(min(samp_df$height), max(samp_df$height), length = 100)
 y_vals <- dnorm(x_vals, mean = mean(samp_df$height), sd = sd(samp_df$height))
 lines(x_vals, y_vals, col = "red", lwd = 2)
@@ -406,7 +406,7 @@ lines(x_vals, y_vals, col = "red", lwd = 2)
 
 ```{r}
 #| label: Weight
-hist(samp_df$weight, breaks = seq(from=130, to=160, by = 0.5), xlab = "Weight", main = "Sample Mean Weights", probability = TRUE, col="lightblue")
+hist(samp_df$weight, breaks = seq(from=min(samp_df$weight) - 5, to=max(samp_df$weight) + 5, by = 0.5), xlab = "Weight", main = "Sample Mean Weights", probability = TRUE, col="lightblue")
 x_vals <- seq(min(samp_df$weight), max(samp_df$weight), length = 100)
 y_vals <- dnorm(x_vals, mean = mean(samp_df$weight), sd = sd(samp_df$weight))
 lines(x_vals, y_vals, col = "red", lwd = 2)
@@ -414,7 +414,7 @@ lines(x_vals, y_vals, col = "red", lwd = 2)
 
 ```{r}
 #| label: Age
-hist(samp_df$age, breaks = seq(from=18, to=22, by = 0.25), xlab = "Age", main = "Sample Mean Ages", probability = TRUE, col="lightblue")
+hist(samp_df$age, breaks = seq(from=min(samp_df$age) - 0.5, to=max(samp_df$age) + 0.5, by = 0.25), xlab = "Age", main = "Sample Mean Ages", probability = TRUE, col="lightblue")
 x_vals <- seq(min(samp_df$age), max(samp_df$age), length = 100)
 y_vals <- dnorm(x_vals, mean = mean(samp_df$age), sd = sd(samp_df$age))
 lines(x_vals, y_vals, col = "red", lwd = 2)
@@ -426,7 +426,7 @@ What about for those variables that you concluded were *not* originally drawn fr
 
 ```{r}
 #| label: Kills
-hist(samp_df$zombies_killed, breaks = seq(from=2, to=4, by = 0.1), xlab = "Zombies Killed", main = "Sample Mean Zombies Killed", probability = TRUE, col="lightblue")
+hist(samp_df$zombies_killed, breaks = seq(from=min(samp_df$zombies_killed) - 0.25, to=max(samp_df$zombies_killed) + 0.25, by = 0.1), xlab = "Zombies Killed", main = "Sample Mean Zombies Killed", probability = TRUE, col="lightblue")
 x_vals <- seq(min(samp_df$zombies_killed), max(samp_df$zombies_killed), length = 100)
 y_vals <- dnorm(x_vals, mean = mean(samp_df$zombies_killed), sd = sd(samp_df$zombies_killed))
 lines(x_vals, y_vals, col = "red", lwd = 2)
@@ -434,7 +434,7 @@ lines(x_vals, y_vals, col = "red", lwd = 2)
 
 ```{r}
 #| label: Years of Education
-hist(samp_df$education, breaks = seq(from=min(samp_df$education - .5), to=max(samp_df$education + .5), by = 0.15), xlab = "Mean Years of Education", main = "Sample Mean Years of Education", probability = TRUE, col="lightblue")
+hist(samp_df$education, breaks = seq(from=min(samp_df$education - 1), to=max(samp_df$education + 1), by = 0.15), xlab = "Mean Years of Education", main = "Sample Mean Years of Education", probability = TRUE, col="lightblue")
 x_vals <- seq(min(samp_df$education), max(samp_df$education), length = 100)
 y_vals <- dnorm(x_vals, mean = mean(samp_df$education), sd = sd(samp_df$education))
 lines(x_vals, y_vals, col = "red", lwd = 2)
